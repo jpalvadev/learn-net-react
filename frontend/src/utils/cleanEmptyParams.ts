@@ -1,4 +1,7 @@
-import { DEFAULT_PAGE_INDEX, DEFAULT_PAGE_SIZE } from '@/components/table';
+import {
+    DEFAULT_PAGE_INDEX,
+    DEFAULT_PAGE_SIZE,
+} from '@/components/genericTable';
 
 export const cleanEmptyParams = <T extends Record<string, unknown>>(
     search: T

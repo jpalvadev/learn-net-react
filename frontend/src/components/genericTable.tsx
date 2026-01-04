@@ -10,6 +10,31 @@ import {
 } from '@tanstack/react-table';
 import { type Filters } from '../api/types';
 import { DebouncedInput } from './debouncedInput';
+import {
+    TableHeader,
+    TableRow,
+    TableHead,
+    TableBody,
+    TableCell,
+    Table,
+} from './ui/table';
+import { Button } from './ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from './ui/select';
+import { SelectGroup } from '@radix-ui/react-select';
+import { Input } from './ui/input';
+import {
+    ChevronFirst,
+    ChevronLast,
+    ChevronLeft,
+    ChevronRight,
+} from 'lucide-react';
 
 export const DEFAULT_PAGE_INDEX = 0;
 export const DEFAULT_PAGE_SIZE = 10;
@@ -28,7 +53,9 @@ type Props<T extends Record<string, string | number>> = {
     onSortingChange: OnChangeFn<SortingState>;
 };
 
-export default function Table<T extends Record<string, string | number>>({
+export default function GenericTable<
+    T extends Record<string, string | number>,
+>({
     data,
     columns,
     pagination,
@@ -49,6 +76,163 @@ export default function Table<T extends Record<string, string | number>>({
         manualPagination: true,
         getCoreRowModel: getCoreRowModel(),
     });
+
+    return (
+        <div>
+            <div className="overflow-hidden rounded-md border">
+                <Table>
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef
+                                                          .header,
+                                                      header.getContext()
+                                                  )}
+                                        </TableHead>
+                                    );
+                                })}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={
+                                        row.getIsSelected() && 'selected'
+                                    }
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center"
+                                >
+                                    No results.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 my-4">
+                <div className="flex items-center gap-16">
+                    <div>{table.getRowCount()} registros encontrados</div>
+
+                    {/* Go to Page */}
+                    <div className="flex items-center gap-2">
+                        <span>
+                            Página
+                            <strong>
+                                {table.getState().pagination.pageIndex + 1} de{' '}
+                                {table.getPageCount()}
+                            </strong>
+                        </span>
+                        <span> - Ir a Página:</span>
+                        <Input
+                            type="number"
+                            value={table.getState().pagination.pageIndex + 1}
+                            onChange={(e) => {
+                                const page = e.target.value
+                                    ? Number(e.target.value) - 1
+                                    : 0;
+                                table.setPageIndex(page);
+                            }}
+                            min={1}
+                            max={table.getPageCount()}
+                            className="border p-1 rounded w-16"
+                        />
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-16">
+                    {/* Select rows per page */}
+                    <div className="flex items-center gap-2">
+                        <span>Mostrar</span>
+                        <Select
+                            defaultValue="10"
+                            value={table
+                                .getState()
+                                .pagination.pageSize.toString()}
+                            onValueChange={(value) => {
+                                table.setPageSize(Number(value));
+                            }}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="10" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Registros</SelectLabel>
+
+                                    {[10, 20, 50].map((pageSize) => (
+                                        <SelectItem
+                                            key={pageSize}
+                                            value={pageSize.toString()}
+                                        >
+                                            {pageSize}
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* Botonera paginacion */}
+                    <div className="flex items-center gap-2">
+                        <Button
+                            onClick={() => table.setPageIndex(0)}
+                            disabled={!table.getCanPreviousPage()}
+                            variant="outline"
+                        >
+                            <ChevronFirst />
+                        </Button>
+                        <Button
+                            onClick={() => table.previousPage()}
+                            disabled={!table.getCanPreviousPage()}
+                            variant="outline"
+                        >
+                            <ChevronLeft />
+                        </Button>
+                        <Button
+                            onClick={() => table.nextPage()}
+                            disabled={!table.getCanNextPage()}
+                            variant="outline"
+                        >
+                            <ChevronRight />
+                        </Button>
+                        <Button
+                            onClick={() =>
+                                table.setPageIndex(table.getPageCount() - 1)
+                            }
+                            disabled={!table.getCanNextPage()}
+                            variant="outline"
+                        >
+                            <ChevronLast />
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 
     return (
         <div>

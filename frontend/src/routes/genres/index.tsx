@@ -2,10 +2,10 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
-import Table, {
+import GenericTable, {
     DEFAULT_PAGE_INDEX,
     DEFAULT_PAGE_SIZE,
-} from '@/components/table';
+} from '@/components/genericTable';
 import { useFilters } from '@/hooks/useFilters';
 import { sortByToState, stateToSortBy } from '@/utils/tableSortMapper';
 
@@ -13,6 +13,7 @@ import type { Filters } from '@/api/types';
 import { type Genre } from '@/modules/genres/types/genre.type';
 import { GENRE_COLUMNS } from '@/modules/genres/genreColumns';
 import { fetchGenres } from '@/modules/genres/services/genre.service';
+import { Button } from '@/components/ui/button';
 
 export type GenreFilters = Filters<Genre>;
 
@@ -39,10 +40,19 @@ function GenresPage() {
 
     return (
         <div className="flex flex-col gap-2 p-2">
-            <h1 className="text-2xl font-semibold mb-1">
-                TanStack Table + Query + Router
-            </h1>
-            <Table
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-semibold mb-1">Genres</h1>
+                {Object.keys(filters).length > 0 && (
+                    <Button
+                        onClick={resetFilters}
+                        disabled={Object.keys(filters).length === 0}
+                        variant="outline"
+                    >
+                        Limpiar filtros
+                    </Button>
+                )}
+            </div>
+            <GenericTable
                 data={data?.result ?? []}
                 columns={columns}
                 pagination={paginationState}
@@ -69,16 +79,7 @@ function GenresPage() {
                     });
                 }}
             />
-            <div className="flex items-center gap-2">
-                {data?.rowCount} genres found
-                <button
-                    className="border rounded p-1 disabled:text-gray-500 disabled:cursor-not-allowed"
-                    onClick={resetFilters}
-                    disabled={Object.keys(filters).length === 0}
-                >
-                    Reset Filters
-                </button>
-            </div>
+            <div className="flex items-center gap-2"></div>
             <pre>{JSON.stringify(filters, null, 2)}</pre>
         </div>
     );

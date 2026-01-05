@@ -32,6 +32,7 @@ export const GENRE_COLUMNS: ColumnDef<Genre>[] = [
     },
     {
         id: 'actions',
+
         cell: ({ row }) => {
             const genre = row.original;
 

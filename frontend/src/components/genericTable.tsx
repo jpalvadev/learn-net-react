@@ -38,6 +38,8 @@ import {
     ChevronRight,
     ChevronsUpDown,
     ChevronUp,
+    FunnelIcon,
+    Settings2Icon,
 } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -46,6 +48,9 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Label } from './ui/label';
 
 export const DEFAULT_PAGE_INDEX = 0;
 export const DEFAULT_PAGE_SIZE = 10;
@@ -105,149 +110,147 @@ export default function GenericTable<
                                         header.column.columnDef.meta;
                                     return (
                                         <TableHead key={header.id}>
-                                            {
-                                                // header.isPlaceholder
-                                                !header.column.getCanSort() ? null : (
-                                                    <>
-                                                        <div
-                                                            {...{
-                                                                className:
-                                                                    header.column.getCanSort()
-                                                                        ? 'cursor-pointer select-none flex items-center gap-1'
-                                                                        : '',
-                                                                onClick:
-                                                                    header.column.getToggleSortingHandler(),
-                                                            }}
+                                            {header.column.getCanSort() ? (
+                                                <div className="select-none flex items-center gap-2">
+                                                    {flexRender(
+                                                        header.column.columnDef
+                                                            .header,
+                                                        header.getContext()
+                                                    )}
+                                                    <div
+                                                        {...{
+                                                            className:
+                                                                header.column.getCanSort()
+                                                                    ? 'cursor-pointer'
+                                                                    : '',
+                                                            onClick:
+                                                                header.column.getToggleSortingHandler(),
+                                                        }}
+                                                    >
+                                                        {{
+                                                            asc: (
+                                                                <ChevronUp
+                                                                    size={18}
+                                                                />
+                                                            ),
+                                                            desc: (
+                                                                <ChevronDown
+                                                                    size={18}
+                                                                />
+                                                            ),
+                                                            false: (
+                                                                <ChevronsUpDown
+                                                                    size={18}
+                                                                />
+                                                            ),
+                                                        }[
+                                                            header.column.getIsSorted() as string
+                                                        ] ?? null}
+                                                    </div>
+                                                    {header.column.getCanFilter() &&
+                                                    fieldMeta?.filterKey !==
+                                                        undefined ? (
+                                                        <Popover>
+                                                            <PopoverTrigger
+                                                                asChild
+                                                            >
+                                                                <FunnelIcon
+                                                                    size={18}
+                                                                    fill={
+                                                                        filters[
+                                                                            fieldMeta
+                                                                                .filterKey
+                                                                        ]
+                                                                            ? 'currentColor'
+                                                                            : 'none'
+                                                                    }
+                                                                    className="cursor-pointer"
+                                                                />
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-64 flex gap-4">
+                                                                <Label htmlFor="width">
+                                                                    Filtrar
+                                                                </Label>
+                                                                <DebouncedInput
+                                                                    className="w-36 border shadow rounded"
+                                                                    onChange={(
+                                                                        value
+                                                                    ) => {
+                                                                        onFilterChange(
+                                                                            {
+                                                                                [fieldMeta.filterKey as keyof T]:
+                                                                                    value,
+                                                                            } as Partial<T>
+                                                                        );
+                                                                    }}
+                                                                    placeholder="Filtrar por..."
+                                                                    type={
+                                                                        fieldMeta.filterVariant ===
+                                                                        'number'
+                                                                            ? 'number'
+                                                                            : 'text'
+                                                                    }
+                                                                    value={
+                                                                        filters[
+                                                                            fieldMeta
+                                                                                .filterKey
+                                                                        ] ?? ''
+                                                                    }
+                                                                />
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                    ) : null}
+                                                </div>
+                                            ) : (
+                                                <div className="flex justify-end mr-1.5">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger
+                                                            asChild
                                                         >
-                                                            {flexRender(
-                                                                header.column
-                                                                    .columnDef
-                                                                    .header,
-                                                                header.getContext()
-                                                            )}
-                                                            {{
-                                                                asc: (
-                                                                    <ChevronUp
-                                                                        size={
-                                                                            18
-                                                                        }
-                                                                    />
-                                                                ),
-                                                                desc: (
-                                                                    <ChevronDown
-                                                                        size={
-                                                                            18
-                                                                        }
-                                                                    />
-                                                                ),
-                                                                false: (
-                                                                    <ChevronsUpDown
-                                                                        size={
-                                                                            18
-                                                                        }
-                                                                    />
-                                                                ),
-                                                            }[
-                                                                header.column.getIsSorted() as string
-                                                            ] ?? null}
-                                                        </div>
-                                                        {header.column.getCanFilter() &&
-                                                        fieldMeta?.filterKey !==
-                                                            undefined ? (
-                                                            <DebouncedInput
-                                                                className="w-36 border shadow rounded"
-                                                                onChange={(
-                                                                    value
-                                                                ) => {
-                                                                    onFilterChange(
-                                                                        {
-                                                                            [fieldMeta.filterKey as keyof T]:
-                                                                                value,
-                                                                        } as Partial<T>
-                                                                    );
-                                                                }}
-                                                                placeholder="Filtrar por..."
-                                                                type={
-                                                                    fieldMeta.filterVariant ===
-                                                                    'number'
-                                                                        ? 'number'
-                                                                        : 'text'
-                                                                }
-                                                                value={
-                                                                    filters[
-                                                                        fieldMeta
-                                                                            .filterKey
-                                                                    ] ?? ''
-                                                                }
+                                                            <Settings2Icon
+                                                                size={20}
+                                                                className="cursor-pointer"
                                                             />
-                                                        ) : null}
-                                                        {header.column.id ===
-                                                            'actions' && (
-                                                            <DropdownMenu>
-                                                                <DropdownMenuTrigger
-                                                                    asChild
-                                                                >
-                                                                    <Button
-                                                                        variant="outline"
-                                                                        className="ml-auto"
-                                                                    >
-                                                                        Columnas
-                                                                    </Button>
-                                                                </DropdownMenuTrigger>
-                                                                <DropdownMenuContent align="end">
-                                                                    {table
-                                                                        .getAllColumns()
-                                                                        .filter(
-                                                                            (
-                                                                                column
-                                                                            ) =>
-                                                                                column.getCanHide()
-                                                                        )
-                                                                        .map(
-                                                                            (
-                                                                                column
-                                                                            ) => {
-                                                                                return (
-                                                                                    <DropdownMenuCheckboxItem
-                                                                                        key={
-                                                                                            column.id
-                                                                                        }
-                                                                                        className="capitalize"
-                                                                                        checked={column.getIsVisible()}
-                                                                                        onCheckedChange={(
-                                                                                            value
-                                                                                        ) =>
-                                                                                            column.toggleVisibility(
-                                                                                                !!value
-                                                                                            )
-                                                                                        }
-                                                                                    >
-                                                                                        {
-                                                                                            column.id
-                                                                                        }
-                                                                                    </DropdownMenuCheckboxItem>
-                                                                                );
-                                                                            }
-                                                                        )}
-                                                                </DropdownMenuContent>
-                                                            </DropdownMenu>
-                                                        )}
-                                                    </>
-                                                )
-                                            }
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            {table
+                                                                .getAllColumns()
+                                                                .filter(
+                                                                    (column) =>
+                                                                        column.getCanHide()
+                                                                )
+                                                                .map(
+                                                                    (
+                                                                        column
+                                                                    ) => {
+                                                                        return (
+                                                                            <DropdownMenuCheckboxItem
+                                                                                key={
+                                                                                    column.id
+                                                                                }
+                                                                                className="capitalize"
+                                                                                checked={column.getIsVisible()}
+                                                                                onCheckedChange={(
+                                                                                    value
+                                                                                ) =>
+                                                                                    column.toggleVisibility(
+                                                                                        !!value
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    column.id
+                                                                                }
+                                                                            </DropdownMenuCheckboxItem>
+                                                                        );
+                                                                    }
+                                                                )}
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                            )}
                                         </TableHead>
                                     );
-                                    // return (
-                                    //     <TableHead key={header.id}>
-                                    //         {header.isPlaceholder
-                                    //             ? null
-                                    //             : flexRender(
-                                    //                   header.column.columnDef
-                                    //                       .header,
-                                    //                   header.getContext()
-                                    //               )}
-                                    //     </TableHead>
-                                    // );
                                 })}
                             </TableRow>
                         ))}

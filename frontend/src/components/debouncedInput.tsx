@@ -1,4 +1,5 @@
 import { type InputHTMLAttributes, useEffect, useState } from 'react';
+import { Input } from './ui/input';
 
 export function DebouncedInput({
     value: initialValue,
@@ -26,7 +27,7 @@ export function DebouncedInput({
     }, [value]);
 
     return (
-        <input
+        <Input
             {...props}
             value={value ?? ''}
             onChange={(e) => {

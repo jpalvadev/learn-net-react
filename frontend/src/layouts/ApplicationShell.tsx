@@ -1,16 +1,13 @@
 import {
-    CalendarClockIcon,
     ChartNoAxesCombinedIcon,
+    ChevronRightIcon,
     FacebookIcon,
     HomeIcon,
     InfoIcon,
     InstagramIcon,
-    LanguagesIcon,
     LinkedinIcon,
-    SettingsIcon,
-    SquareActivityIcon,
+    PlusIcon,
     TwitterIcon,
-    Undo2Icon,
     UsersIcon,
 } from 'lucide-react';
 
@@ -18,7 +15,7 @@ import { Link, Outlet } from '@tanstack/react-router';
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-// import { Card, CardContent } from '@/components/ui/card';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     Breadcrumb,
@@ -38,12 +35,20 @@ import {
     SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
     SidebarProvider,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
 
-import LanguageDropdown from '@/components/blocks/DropdownLanguage';
 import ProfileDropdown from '@/components/blocks/DropdownProfile';
+import { ModeToggle } from '@/components/mode-toggle';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 
 const ApplicationShell = () => {
     return (
@@ -90,12 +95,12 @@ const ApplicationShell = () => {
                                                 className="[&.active]:font-bold [&.active>svg]:stroke-3"
                                             >
                                                 <InfoIcon />
-                                                <span>About</span>
+                                                <span>Sobre Nosotros</span>
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
 
-                                    <SidebarMenuItem>
+                                    {/* <SidebarMenuItem>
                                         <SidebarMenuButton asChild>
                                             <Link
                                                 to="/genres"
@@ -105,59 +110,69 @@ const ApplicationShell = () => {
                                                 <span>Genres</span>
                                             </Link>
                                         </SidebarMenuButton>
-                                    </SidebarMenuItem>
+                                    </SidebarMenuItem> */}
+
+                                    <Collapsible
+                                        defaultOpen={false}
+                                        className="group/collapsible"
+                                    >
+                                        <SidebarMenuItem>
+                                            <CollapsibleTrigger asChild>
+                                                <SidebarMenuButton>
+                                                    <UsersIcon />
+                                                    <span>Genres</span>
+                                                    <ChevronRightIcon className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                                                </SidebarMenuButton>
+                                            </CollapsibleTrigger>
+                                            <CollapsibleContent>
+                                                <SidebarMenuSub>
+                                                    <SidebarMenuSubItem>
+                                                        <SidebarMenuSubButton
+                                                            asChild
+                                                        >
+                                                            <Link
+                                                                to="/genres"
+                                                                className="[&.active]:font-bold [&.active>svg]:stroke-3"
+                                                            >
+                                                                <UsersIcon />
+                                                                <span>
+                                                                    Listado de
+                                                                    Genres
+                                                                </span>
+                                                            </Link>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                    <SidebarMenuSubItem>
+                                                        <SidebarMenuSubButton
+                                                            asChild
+                                                        >
+                                                            <Link
+                                                                to="/genres/create"
+                                                                className="[&.active]:font-bold [&.active>svg]:stroke-3"
+                                                            >
+                                                                <PlusIcon />
+                                                                <span>
+                                                                    Crear Genre
+                                                                </span>
+                                                            </Link>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                </SidebarMenuSub>
+                                            </CollapsibleContent>
+                                        </SidebarMenuItem>
+                                    </Collapsible>
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>
                         <SidebarGroup>
-                            <SidebarGroupLabel>
-                                Supporting Features
-                            </SidebarGroupLabel>
+                            <SidebarGroupLabel>Admin Menú</SidebarGroupLabel>
                             <SidebarGroupContent>
                                 <SidebarMenu>
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild>
                                             <a href="#">
-                                                <SquareActivityIcon />
-                                                <span>
-                                                    Real Time Monitoring
-                                                </span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href="#">
-                                                <CalendarClockIcon />
-                                                <span>
-                                                    Schedule Post & Calendar
-                                                </span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href="#">
-                                                <Undo2Icon />
-                                                <span>Report & Export</span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href="#">
-                                                <SettingsIcon />
-                                                <span>
-                                                    Settings & Integrations
-                                                </span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href="#">
                                                 <UsersIcon />
-                                                <span>User Management</span>
+                                                <span>Roles de Usuario</span>
                                             </a>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
@@ -191,31 +206,28 @@ const ApplicationShell = () => {
                                         <BreadcrumbSeparator />
                                         <BreadcrumbItem>
                                             <BreadcrumbPage>
-                                                Free
+                                                Implementar Breadcrumb
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
                                     </BreadcrumbList>
                                 </Breadcrumb>
                             </div>
                             <div className="flex items-center gap-1.5">
-                                <LanguageDropdown
+                                {/* <LanguageDropdown
                                     trigger={
                                         <Button variant="ghost" size="icon">
                                             <LanguagesIcon />
                                         </Button>
                                     }
-                                />
+                                /> */}
+                                <ModeToggle />
                                 <ProfileDropdown
                                     trigger={
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="size-9.5"
-                                        >
-                                            <Avatar className="size-9.5 rounded-md">
+                                        <Button variant="ghost" size="icon">
+                                            <Avatar className="rounded-md">
                                                 <AvatarImage src="https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png" />
                                                 <AvatarFallback>
-                                                    JD
+                                                    JPA
                                                 </AvatarFallback>
                                             </Avatar>
                                         </Button>
@@ -226,7 +238,7 @@ const ApplicationShell = () => {
                     </header>
 
                     {/* Main Content - Outlet */}
-                    <main className="mx-auto size-full max-w-7xl flex-1 p-4 sm:px-6">
+                    <main className="mx-auto size-full max-w-480 flex-1 p-4 sm:px-6">
                         <Outlet />
                     </main>
 

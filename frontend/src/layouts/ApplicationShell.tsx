@@ -161,6 +161,41 @@ const ApplicationShell = () => {
                                             </CollapsibleContent>
                                         </SidebarMenuItem>
                                     </Collapsible>
+
+                                    {/* Examples callapsible */}
+                                    <Collapsible
+                                        defaultOpen={false}
+                                        className="group/collapsible"
+                                    >
+                                        <SidebarMenuItem>
+                                            <CollapsibleTrigger asChild>
+                                                <SidebarMenuButton>
+                                                    <UsersIcon />
+                                                    <span>Examples</span>
+                                                    <ChevronRightIcon className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                                                </SidebarMenuButton>
+                                            </CollapsibleTrigger>
+                                            <CollapsibleContent>
+                                                <SidebarMenuSub>
+                                                    <SidebarMenuSubItem>
+                                                        <SidebarMenuSubButton
+                                                            asChild
+                                                        >
+                                                            <Link
+                                                                to="/examples"
+                                                                className="[&.active]:font-bold [&.active>svg]:stroke-3"
+                                                            >
+                                                                <PlusIcon />
+                                                                <span>
+                                                                    Example Form
+                                                                </span>
+                                                            </Link>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                </SidebarMenuSub>
+                                            </CollapsibleContent>
+                                        </SidebarMenuItem>
+                                    </Collapsible>
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>

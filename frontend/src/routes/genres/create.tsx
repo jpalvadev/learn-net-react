@@ -4,36 +4,26 @@ export const Route = createFileRoute('/genres/create')({
     component: CreateGenrePage,
 });
 
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import {
-    PROJECT_STATUSES,
-    projectSchema,
-} from '@/modules/genres/types/genre.type';
-import { toast } from 'sonner';
 import {
     Field,
     FieldContent,
     FieldDescription,
     FieldError,
     FieldGroup,
-    FieldLabel,
     FieldLegend,
     FieldSeparator,
     FieldSet,
 } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
+    PROJECT_STATUSES,
+    projectSchema,
+} from '@/modules/genres/types/genre.type';
+import { toast } from 'sonner';
+import * as z from 'zod';
+
+import { useAppForm } from '@/components/form/hooks';
+import { Button } from '@/components/ui/button';
+import { SelectItem } from '@/components/ui/select';
 import {
     InputGroup,
     InputGroupAddon,
@@ -42,8 +32,10 @@ import {
 } from '@/components/ui/input-group';
 import { XIcon } from 'lucide-react';
 
+type FormData = z.infer<typeof projectSchema>;
+
 function CreateGenrePage() {
-    const form = useForm({
+    const form = useAppForm({
         defaultValues: {
             name: '',
             description: '',
@@ -54,21 +46,30 @@ function CreateGenrePage() {
                 push: false,
             },
             users: [{ email: '' }],
+        } satisfies FormData as FormData,
+        validators: {
+            onSubmit: projectSchema,
         },
-        resolver: zodResolver(projectSchema),
-    });
+        onSubmit: async ({ value }) => {
+            console.log('Form submitted:', value);
+            const res = await createGenre(value);
 
-    const {
-        fields: users,
-        append: addUser,
-        remove: removeUser,
-    } = useFieldArray({
-        control: form.control,
-        name: 'users',
-        // rules: {
-        //   maxLength: 5,
-        //   minLength: 1,
-        // },
+            if (res.success) {
+                form.reset();
+                toast('Genre created successfully', {
+                    description: JSON.stringify(value, null, 2),
+                    className: 'whitespace-pre-wrap font-mono',
+                    action: {
+                        label: 'Undo',
+                        onClick: () => console.log('Undo'),
+                    },
+                });
+            } else {
+                toast.error('Error creating genre', {
+                    description: JSON.stringify(res, null, 2),
+                });
+            }
+        },
     });
 
     async function createGenre(
@@ -81,112 +82,39 @@ function CreateGenrePage() {
         return { success: true };
     }
 
-    async function onSubmit(data: z.infer<typeof projectSchema>) {
-        console.log('Form submitted:', data);
-        const res = await createGenre(data);
-
-        if (res.success) {
-            form.reset();
-            toast('Genre created successfully', {
-                description: JSON.stringify(data, null, 2),
-                className: 'whitespace-pre-wrap font-mono',
-                action: {
-                    label: 'Undo',
-                    onClick: () => console.log('Undo'),
-                },
-            });
-        } else {
-            toast.error('Error creating genre', {
-                description: JSON.stringify(res, null, 2),
-            });
-        }
-    }
-
     return (
         <div className="container px-4 mx-auto my-6">
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit();
+                }}
+            >
                 <FieldGroup>
-                    <Controller
-                        name="name"
-                        control={form.control}
-                        render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor={field.name}>
-                                    Name
-                                </FieldLabel>
-                                <Input
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                />
-                                {fieldState.invalid && (
-                                    <FieldError errors={[fieldState.error]} />
-                                )}
-                            </Field>
-                        )}
-                    />
-                    <Controller
-                        name="description"
-                        control={form.control}
-                        render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                <FieldContent>
-                                    <FieldLabel htmlFor={field.name}>
-                                        Description
-                                    </FieldLabel>
-                                    <FieldDescription>
-                                        Be as specific as possible
-                                    </FieldDescription>
-                                </FieldContent>
-                                <Textarea
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                />
-                                {fieldState.invalid && (
-                                    <FieldError errors={[fieldState.error]} />
-                                )}
-                            </Field>
-                        )}
-                    />
+                    <form.AppField name="name">
+                        {(field) => <field.Input label="Name" />}
+                    </form.AppField>
 
-                    <Controller
-                        name="status"
-                        control={form.control}
-                        render={({
-                            field: { onChange, onBlur, ...field },
-                            fieldState,
-                        }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor={field.name}>
-                                    Status
-                                </FieldLabel>
-
-                                <Select {...field} onValueChange={onChange}>
-                                    <SelectTrigger
-                                        onBlur={onBlur}
-                                        id={field.name}
-                                        aria-invalid={fieldState.invalid}
-                                    >
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {PROJECT_STATUSES.map((status) => (
-                                            <SelectItem
-                                                key={status}
-                                                value={status}
-                                            >
-                                                {status}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {fieldState.invalid && (
-                                    <FieldError errors={[fieldState.error]} />
-                                )}
-                            </Field>
+                    <form.AppField name="description">
+                        {(field) => (
+                            <field.Textarea
+                                label="Description"
+                                description="Be as specific as possible"
+                            />
                         )}
-                    />
+                    </form.AppField>
+
+                    <form.AppField name="status">
+                        {(field) => (
+                            <field.Select label="Status">
+                                {PROJECT_STATUSES.map((status) => (
+                                    <SelectItem key={status} value={status}>
+                                        {status}
+                                    </SelectItem>
+                                ))}
+                            </field.Select>
+                        )}
+                    </form.AppField>
 
                     <FieldSet>
                         <FieldContent>
@@ -198,182 +126,149 @@ function CreateGenrePage() {
                         </FieldContent>
 
                         <FieldGroup data-slot="checkbox-group">
-                            <Controller
-                                name="notifications.email"
-                                control={form.control}
-                                render={({
-                                    field: { value, onChange, ...field },
-                                    fieldState,
-                                }) => (
-                                    <Field
-                                        data-invalid={fieldState.invalid}
-                                        orientation="horizontal"
-                                    >
-                                        <Checkbox
-                                            {...field}
-                                            checked={value}
-                                            onCheckedChange={onChange}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                        />
-                                        <FieldContent>
-                                            <FieldLabel htmlFor={field.name}>
-                                                Email
-                                            </FieldLabel>
-                                            {fieldState.invalid && (
-                                                <FieldError
-                                                    errors={[fieldState.error]}
-                                                />
-                                            )}
-                                        </FieldContent>
-                                    </Field>
-                                )}
-                            />
+                            <form.AppField name="notifications.email">
+                                {(field) => <field.Checkbox label="Email" />}
+                            </form.AppField>
 
-                            <Controller
-                                name="notifications.sms"
-                                control={form.control}
-                                render={({
-                                    field: { value, onChange, ...field },
-                                    fieldState,
-                                }) => (
-                                    <Field
-                                        data-invalid={fieldState.invalid}
-                                        orientation="horizontal"
-                                    >
-                                        <Checkbox
-                                            {...field}
-                                            checked={value}
-                                            onCheckedChange={onChange}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                        />
-                                        <FieldContent>
-                                            <FieldLabel htmlFor={field.name}>
-                                                SMS
-                                            </FieldLabel>
-                                            {fieldState.invalid && (
-                                                <FieldError
-                                                    errors={[fieldState.error]}
-                                                />
-                                            )}
-                                        </FieldContent>
-                                    </Field>
-                                )}
-                            />
+                            <form.AppField name="notifications.sms">
+                                {(field) => <field.Checkbox label="SMS" />}
+                            </form.AppField>
 
-                            <Controller
-                                name="notifications.push"
-                                control={form.control}
-                                render={({
-                                    field: { value, onChange, ...field },
-                                    fieldState,
-                                }) => (
-                                    <Field
-                                        data-invalid={fieldState.invalid}
-                                        orientation="horizontal"
-                                    >
-                                        <Checkbox
-                                            {...field}
-                                            checked={value}
-                                            onCheckedChange={onChange}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                        />
-                                        <FieldContent>
-                                            <FieldLabel htmlFor={field.name}>
-                                                Push Notification
-                                            </FieldLabel>
-                                            {fieldState.invalid && (
-                                                <FieldError
-                                                    errors={[fieldState.error]}
-                                                />
-                                            )}
-                                        </FieldContent>
-                                    </Field>
-                                )}
-                            />
+                            <form.AppField name="notifications.push">
+                                {(field) => <field.Checkbox label="Push" />}
+                            </form.AppField>
                         </FieldGroup>
                     </FieldSet>
 
                     <FieldSeparator />
 
-                    {/* Users Array */}
-                    <FieldSet>
-                        <div className="flex justify-between gap-2 items-center">
-                            <FieldContent>
-                                <FieldLegend variant="label" className="mb-0">
-                                    User email Addresses
-                                </FieldLegend>
-                                <FieldDescription>
-                                    Enter the email addresses of users for this
-                                    project (up to 5).
-                                </FieldDescription>
-                                {form.formState.errors.users?.root && (
-                                    <FieldError
-                                        errors={[
-                                            form.formState.errors.users?.root,
-                                        ]}
-                                    />
-                                )}
-                            </FieldContent>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addUser({ email: '' })}
-                            >
-                                Add Users
-                            </Button>
-                        </div>
-                        <FieldGroup>
-                            {users.map((user, index) => (
-                                <Controller
-                                    key={user.id}
-                                    name={`users.${index}.email`}
-                                    control={form.control}
-                                    render={({ field, fieldState }) => (
-                                        <Field
-                                            data-invalid={fieldState.invalid}
-                                        >
-                                            <InputGroup>
-                                                <InputGroupInput
-                                                    {...field}
-                                                    type="email"
-                                                    id={field.name}
-                                                    aria-invalid={
-                                                        fieldState.invalid
-                                                    }
-                                                    aria-label={`User ${index + 1} email`}
-                                                />
-                                                <InputGroupAddon align="inline-end">
-                                                    <InputGroupButton
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="icon-xs"
-                                                        onClick={() =>
-                                                            removeUser(index)
-                                                        }
-                                                        aria-label={`Remove user ${index + 1} email`}
-                                                    >
-                                                        <XIcon />
-                                                    </InputGroupButton>
-                                                </InputGroupAddon>
-                                            </InputGroup>
-
-                                            {fieldState.invalid && (
+                    <form.Field name="users" mode="array">
+                        {(field) => {
+                            return (
+                                <FieldSet>
+                                    <div className="flex justify-between gap-2 items-center">
+                                        <FieldContent>
+                                            <FieldLegend
+                                                variant="label"
+                                                className="mb-0"
+                                            >
+                                                User Email Addresses
+                                            </FieldLegend>
+                                            <FieldDescription>
+                                                Add up to 5 users to this
+                                                project (including yourself).
+                                            </FieldDescription>
+                                            {field.state.meta.errors && (
                                                 <FieldError
-                                                    errors={[fieldState.error]}
+                                                    errors={
+                                                        field.state.meta.errors
+                                                    }
                                                 />
                                             )}
-                                        </Field>
-                                    )}
-                                />
-                            ))}
-                        </FieldGroup>
-                    </FieldSet>
+                                        </FieldContent>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                field.pushValue({ email: '' })
+                                            }
+                                        >
+                                            Add User
+                                        </Button>
+                                    </div>
+                                    <FieldGroup>
+                                        {field.state.value.map((_, index) => (
+                                            <form.Field
+                                                key={index}
+                                                name={`users[${index}].email`}
+                                            >
+                                                {(innerField) => {
+                                                    const isInvalid =
+                                                        innerField.state.meta
+                                                            .isTouched &&
+                                                        !innerField.state.meta
+                                                            .isValid;
+                                                    return (
+                                                        <Field
+                                                            orientation="horizontal"
+                                                            data-invalid={
+                                                                isInvalid
+                                                            }
+                                                        >
+                                                            <FieldContent>
+                                                                <InputGroup>
+                                                                    <InputGroupInput
+                                                                        id={
+                                                                            innerField.name
+                                                                        }
+                                                                        aria-invalid={
+                                                                            isInvalid
+                                                                        }
+                                                                        aria-label={`User ${index + 1} email`}
+                                                                        type="email"
+                                                                        onBlur={
+                                                                            innerField.handleBlur
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            innerField.handleChange(
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                        value={
+                                                                            innerField
+                                                                                .state
+                                                                                .value
+                                                                        }
+                                                                    />
+                                                                    {field.state
+                                                                        .value
+                                                                        .length >
+                                                                        1 && (
+                                                                        <InputGroupAddon align="inline-end">
+                                                                            <InputGroupButton
+                                                                                type="button"
+                                                                                variant="ghost"
+                                                                                size="icon-xs"
+                                                                                onClick={() =>
+                                                                                    field.removeValue(
+                                                                                        index
+                                                                                    )
+                                                                                }
+                                                                                aria-label={`Remove User ${index + 1}`}
+                                                                            >
+                                                                                <XIcon />
+                                                                            </InputGroupButton>
+                                                                        </InputGroupAddon>
+                                                                    )}
+                                                                </InputGroup>
+                                                                {isInvalid && (
+                                                                    <FieldError
+                                                                        errors={
+                                                                            innerField
+                                                                                .state
+                                                                                .meta
+                                                                                .errors
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </FieldContent>
+                                                        </Field>
+                                                    );
+                                                }}
+                                            </form.Field>
+                                        ))}
+                                    </FieldGroup>
+                                </FieldSet>
+                            );
+                        }}
+                    </form.Field>
 
-                    <Button>Create</Button>
+                    <Button type="submit">Create</Button>
                 </FieldGroup>
             </form>
         </div>

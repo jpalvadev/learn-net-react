@@ -14,7 +14,7 @@ export const projectSchema = z.object({
     status: z.enum(PROJECT_STATUSES),
     description: z
         .string()
-        .optional()
+        // .optional()
         .transform((v) => v || undefined),
     notifications: z.object({
         email: z.boolean(),

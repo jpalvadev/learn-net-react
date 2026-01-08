@@ -45,21 +45,21 @@ namespace MoviesAPI.Controllers
 
 
         [HttpGet("{id:int}", Name = "GetGenreById")]
-    [OutputCache(Tags = [cacheTag])] //una vez seteado y activado el uso de cache en Program.cs, lo usamos asi
-    public async Task<ActionResult<GenreDTO>> Get(int id)
-    {
-      GenreDTO? genreDTO = await context.Genres
-        .ProjectTo<GenreDTO>(mapper.ConfigurationProvider)
-        .FirstOrDefaultAsync(g => g.Id == id);
+        [OutputCache(Tags = [cacheTag])] //una vez seteado y activado el uso de cache en Program.cs, lo usamos asi
+        public async Task<ActionResult<GenreDTO>> Get(int id)
+        {
+            GenreDTO? genreDTO = await context.Genres
+                .ProjectTo<GenreDTO>(mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(g => g.Id == id);
 
-      if (genreDTO == null)
-      {
-        return NotFound();
-      }
+            if (genreDTO == null)
+            {
+                return NotFound();
+            }
 
-      return genreDTO;
+            return genreDTO;
 
-    }
+        }
 
     
 

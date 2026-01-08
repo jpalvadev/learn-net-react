@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GenresIndexRouteImport } from './routes/genres/index'
+import { Route as ExamplesIndexRouteImport } from './routes/examples/index'
 import { Route as GenresCreateRouteImport } from './routes/genres/create'
 
 const AboutRoute = AboutRouteImport.update({
@@ -29,6 +30,11 @@ const GenresIndexRoute = GenresIndexRouteImport.update({
   path: '/genres/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExamplesIndexRoute = ExamplesIndexRouteImport.update({
+  id: '/examples/',
+  path: '/examples/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GenresCreateRoute = GenresCreateRouteImport.update({
   id: '/genres/create',
   path: '/genres/create',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/genres/create': typeof GenresCreateRoute
+  '/examples': typeof ExamplesIndexRoute
   '/genres': typeof GenresIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/genres/create': typeof GenresCreateRoute
+  '/examples': typeof ExamplesIndexRoute
   '/genres': typeof GenresIndexRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/genres/create': typeof GenresCreateRoute
+  '/examples/': typeof ExamplesIndexRoute
   '/genres/': typeof GenresIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/genres/create' | '/genres'
+  fullPaths: '/' | '/about' | '/genres/create' | '/examples' | '/genres'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/genres/create' | '/genres'
-  id: '__root__' | '/' | '/about' | '/genres/create' | '/genres/'
+  to: '/' | '/about' | '/genres/create' | '/examples' | '/genres'
+  id: '__root__' | '/' | '/about' | '/genres/create' | '/examples/' | '/genres/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   GenresCreateRoute: typeof GenresCreateRoute
+  ExamplesIndexRoute: typeof ExamplesIndexRoute
   GenresIndexRoute: typeof GenresIndexRoute
 }
 
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GenresIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/examples/': {
+      id: '/examples/'
+      path: '/examples'
+      fullPath: '/examples'
+      preLoaderRoute: typeof ExamplesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/genres/create': {
       id: '/genres/create'
       path: '/genres/create'
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   GenresCreateRoute: GenresCreateRoute,
+  ExamplesIndexRoute: ExamplesIndexRoute,
   GenresIndexRoute: GenresIndexRoute,
 }
 export const routeTree = rootRouteImport
